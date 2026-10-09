@@ -289,12 +289,12 @@ implements	HotteImplementationI,
 
 	@Override
 	public void turnOn() {
+		assert	this.getState() == HotteState.OFF :
+				new PreconditionException("getState() == HotteState.OFF");
+
 		if (Hotte.VERBOSE) {
 			this.traceMessage("Hotte is turned on.\n");
 		}
-
-		assert	this.getState() == HotteState.OFF :
-				new PreconditionException("getState() == HotteState.OFF");
 
 		this.currentState = HotteState.ON;
 		this.currentMode = HotteMode.VITESSE1;		
@@ -302,29 +302,28 @@ implements	HotteImplementationI,
 
 	@Override
 	public void turnOff() {
+		assert	this.getState() == HotteState.ON :
+				new PreconditionException("getState() == HotteState.ON");
+
 		if (Hotte.VERBOSE) {
 			this.traceMessage("Hotte is turned off.\n");
 		}
-
-		assert	this.getState() == HotteState.ON :
-				new PreconditionException("getState() == HotteState.ON");
 
 		this.currentState = HotteState.OFF;		
 	}
 
 	@Override
 	public void setMode(HotteMode m) {
-		if (Hotte.VERBOSE) {
-			this.traceMessage("Hotte is set "+ m.toString()+ ".\n");
-		}
-		
 		assert	m != null :
-			new PreconditionException("Mode != null");
+			new PreconditionException("m != null");
 		assert	this.getState() == HotteState.ON :
 				new PreconditionException("getState() == HotteState.ON");
 		assert	this.getMode() != m :
 				new PreconditionException("getMode() != " + m.toString());
-
+		
+		if (Hotte.VERBOSE) {
+			this.traceMessage("Hotte is set "+ m+ ".\n");
+		}
 		this.currentMode = m;		
 	}
 
