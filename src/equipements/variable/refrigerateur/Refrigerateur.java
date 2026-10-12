@@ -354,7 +354,7 @@ implements	RefrigerateurUserI,
 	@Override
 	public void suspend() {
 		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Refrigerateur is suspended " );
+			this.traceMessage("Refrigerateur is suspended.\n");
 		}
 
 		assert	this.on() : new PreconditionException("on()");		
@@ -368,7 +368,7 @@ implements	RefrigerateurUserI,
 	@Override
 	public void resume() {
 		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Refrigerateur resumes" );
+			this.traceMessage("Refrigerateur resumes.\n" );
 		}
 
 		assert	this.on() : new PreconditionException("on()");		
@@ -381,8 +381,8 @@ implements	RefrigerateurUserI,
 	@Override
 	public boolean suspended() {
 		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Refrigerateur returns its state: " +
-											this.isSuspended + ".\n");
+			this.traceMessage("Refrigerateur returns its suspension status: " 
+								+ this.isSuspended + ".\n");
 		}
 		return this.isSuspended ;
 	}
