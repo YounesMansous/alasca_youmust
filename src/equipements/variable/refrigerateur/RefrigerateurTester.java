@@ -312,6 +312,8 @@ public class RefrigerateurTester extends		AbstractComponent{
 		this.testTemperature();
 		this.testSetMode();
 		this.testCooling();
+		this.testSuspendResume();
+		this.testSwitchOffWhileSuspended();
 		this.statistics.statisticsReport(this);
 	
 	}
@@ -808,7 +810,7 @@ public class RefrigerateurTester extends		AbstractComponent{
 			resultState = this.ruop.on();
 			isCooling = this.riop.cooling();
 			if (!resultState || isCooling) {
-				this.logMessage("     but was: on=" + resultState + "     /but was: cooling=" + isCooling );
+				this.logMessage("     but was: on=" + resultState + ", cooling=" + isCooling );
 				this.statistics.failedCondition();
 			}
 			this.logMessage("    When the Refrigerateur is starts cooling");
@@ -911,5 +913,192 @@ public class RefrigerateurTester extends		AbstractComponent{
 		this.statistics.updateStatistics();
 	}
 
+	public void			testSuspendResume()
+	{
+		this.logMessage("Feature: suspending and resuming the Refrigerateur");
+		this.logMessage("  Scenario: suspending when cooling ");
+		boolean resultState ;
+		boolean isCooling;
+		boolean isSuspended;
+		try {
+			this.logMessage("    Given the Refrigerateur is on and is cooling");
+			//this.ruop.switchOn();
+			this.riop.startCooling();
+			resultState = this.ruop.on();
+			isCooling = this.riop.cooling();
+			if (!resultState || !isCooling) {
+				this.logMessage("     but was: on=" + resultState + ", cooling=" + isCooling );
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    When the HEM suspends the Refrigerateur");
+			this.reop.suspend();
+			this.logMessage("    Then the Refrigerateur is suspended");
+			isSuspended = this.reop.suspended();
+			isCooling = this.riop.cooling();
+			if (!isSuspended || isCooling) {
+				this.logMessage("     but was: cooling=" + isCooling + ", suspending=" + isSuspended);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: starting cooling while suspended");
+		this.logMessage("    Given the Refrigerateur is suspended");
+		try {
+			isSuspended = this.reop.suspended();
+			if (!isSuspended) {
+				this.logMessage("     but was: " + isSuspended);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur starts cooling");
+		this.logMessage("    Then a precondition exception is thrown");
+		boolean old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.riop.startCooling();
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch(Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+		
+		this.logMessage("  Scenario: suspending when suspended");
+		this.logMessage("    Given the Refrigerateur is suspended");
+		try {
+			isSuspended = this.reop.suspended();
+			if (!isSuspended) {
+				this.logMessage("     but was: " + isSuspended);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the HEM suspends the Refrigerateur");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.reop.suspend();
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch(Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: resuming when suspended");
+		this.logMessage("    Given the Refrigerateur is suspended");
+		try {
+			isSuspended = this.reop.suspended();
+			if (!isSuspended) {
+				this.logMessage("     but was: " + isSuspended);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the HEM resumes the Refrigerateur");
+		try {
+			this.reop.resume();
+			this.logMessage("    Then the Refrigerateur is not suspended");
+			isSuspended = this.reop.suspended();
+			if (isSuspended) {
+				this.logMessage("     but was: " + isSuspended);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: resuming when not suspended");
+		this.logMessage("    Given the Refrigerateur is not suspended");
+		try {
+			isSuspended = this.reop.suspended();
+			if (isSuspended) {
+				this.logMessage("     but was: " + isSuspended);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the HEM resumes the Refrigerateur");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.reop.resume();
+			this.logMessage("     but the precondition exception was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+	}
+
+	public void			testSwitchOffWhileSuspended()
+	{
+		this.logMessage("Feature: switching off the Refrigerateur while suspended");
+		this.logMessage("  Scenario: switching off when suspended");
+		boolean resultState;
+		boolean isSuspended;
+		try {
+			this.logMessage("    Given the Refrigerateur is on");
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: off");
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    And the Refrigerateur is suspended by the HEM");
+			this.reop.suspend();
+			isSuspended = this.reop.suspended();
+			if (!isSuspended) {
+				this.logMessage("     but was not suspended");
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    When the Refrigerateur is switched off");
+			this.ruop.switchOff();
+			this.logMessage("    Then the Refrigerateur is off");
+			resultState = this.ruop.on();
+			if (resultState) {
+				this.logMessage("     but was: on");
+				this.statistics.incorrectResult();
+			}
+			this.logMessage("    And the Refrigerateur is not suspended anymore");
+			isSuspended = this.reop.suspended();
+			if (isSuspended) {
+				this.logMessage("     but was still suspended");
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+	}
 
 }
