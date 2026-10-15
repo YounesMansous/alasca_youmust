@@ -4,6 +4,7 @@ import equipements.simple.hotte.connections.HotteUserConnector;
 import equipements.simple.hotte.connections.HotteOutboundPort;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
+import fr.sorbonne_u.components.exceptions.BCMException;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.utils.tests.TestsStatistics;
@@ -11,11 +12,7 @@ import fr.sorbonne_u.exceptions.AssertionChecking;
 import fr.sorbonne_u.exceptions.ImplementationInvariantException;
 import fr.sorbonne_u.exceptions.InvariantException;
 import fr.sorbonne_u.exceptions.PreconditionException;
-import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
-import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
-import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
-import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 
 @RequiredInterfaces(required = {HotteUserCI.class, ClocksServerCI.class})
 public class HotteTester extends		AbstractComponent{
@@ -206,7 +203,265 @@ public class HotteTester extends		AbstractComponent{
 
 	protected void		runAllUnitTests()
 	{
-		this.testSimple();
+		this.testTurnOnOff();
+		this.testSetMode();
+		this.statistics.statisticsReport(this);
 	}
+	
+	public void			testTurnOnOff()
+	{
+		this.logMessage("Feature: turning the Hotte on and off");
+		this.logMessage("  Scenario: turning on when off");
+		HotteState resultState = null;
+		HotteMode resultMode = null;
+		try {
+			this.logMessage("    Given the Hotte is off");
+			resultState = this.hop.getState();
+			if (!HotteState.OFF.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    When the Hotte is turned on");
+			this.hop.turnOn();
+			this.logMessage("    Then the Hotte is on");
+			resultState = this.hop.getState();
+			if (!HotteState.ON.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.incorrectResult();
+			}
+			this.logMessage("    And the Hotte is in mode VITESSE1");
+			resultMode = this.hop.getMode();
+			if (!HotteMode.VITESSE1.equals(resultMode)) {
+				this.logMessage("     but was: " + resultMode);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: turning on when on");
+		this.logMessage("    Given the Hotte is on");
+		try {
+			resultState = this.hop.getState();
+			if (!HotteState.ON.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Hotte is turned on");
+		this.logMessage("    Then a precondition exception is thrown");
+		boolean old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.hop.turnOn();
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch(Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: turning off when on");
+		this.logMessage("    Given the Hotte is on");
+		try {
+			resultState = this.hop.getState();
+			if (!HotteState.ON.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Hotte is turned off");
+		try {
+			this.hop.turnOff();
+			this.logMessage("    Then the Hotte is off");
+			resultState = this.hop.getState();
+			if (!HotteState.OFF.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: turning off when off");
+		this.logMessage("    Given the Hotte is off");
+		try {
+			resultState = this.hop.getState();
+			if (!HotteState.OFF.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Hotte is turned off");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.hop.turnOff();
+			this.logMessage("     but the precondition exception was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+	}
+	
+	public void			testSetMode()
+	{
+		this.logMessage("Feature: switching the Hotte Vitesse1, Vitesse2, Vitesse3 and Boost.");
+		this.logMessage("  Scenario: set the Hotte Boost from Vitesse1");
+		this.logMessage("    Given the Hotte is on");
+		HotteState resultState = null;
+		HotteMode resultMode = null;
+		try {
+			this.hop.turnOn();
+			resultState = this.hop.getState();
+			if (!HotteState.ON.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    And the Hotte is Vitesse1");
+			resultMode = this.hop.getMode();
+			if (!HotteMode.VITESSE1.equals(resultMode)) {
+				this.logMessage("     but was: " + resultMode);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    When the Hotte is set Boost");
+			this.logMessage("    Then the Hotte is on");
+			
+			this.hop.setMode(HotteMode.BOOST);
+			resultState = this.hop.getState();
+			if (!HotteState.ON.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    And  the Hotte is Boost");
+			resultMode = this.hop.getMode();
+			if (!HotteMode.BOOST.equals(resultMode)) {
+				this.logMessage("     but was: " + resultMode);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: set the Hotte Boost from Boost");
+		this.logMessage("    Given the Hotte is on");
+		this.logMessage("    And the Hotte is Boost");
+		this.logMessage("    When the Hotte is set Boost");
+		this.logMessage("    Then a precondition exception is thrown");
+		boolean old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.hop.setMode(HotteMode.BOOST);
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+
+		
+		this.logMessage("  Scenario: set the Hotte mode to null");
+		this.logMessage("    Given the Hotte is on");
+		try {
+			resultState = this.hop.getState();
+			if (!HotteState.ON.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Hotte mode is set to null");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.hop.setMode(null);
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			// attendu : la precondition m != null a echoue
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: set the Hotte Vitesse2 when off");
+		this.logMessage("    Given the Hotte is off");
+		try {
+			this.hop.turnOff();
+			resultState = this.hop.getState();
+			if (!HotteState.OFF.equals(resultState)) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Hotte is set Vitesse2");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.hop.setMode(HotteMode.VITESSE2);
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			// attendu : la precondition getState() == ON a echoue
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+	}
+
+
 
 }

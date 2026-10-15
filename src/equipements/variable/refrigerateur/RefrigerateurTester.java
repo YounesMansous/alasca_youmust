@@ -8,8 +8,10 @@ import equipements.variable.refrigerateur.connections.RefrigerateurUserConnector
 import equipements.variable.refrigerateur.connections.RefrigerateurUserOutboundPort;
 import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.MeasurementUnit;
+import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
+import fr.sorbonne_u.components.exceptions.BCMException;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.utils.tests.TestsStatistics;
@@ -306,7 +308,607 @@ public class RefrigerateurTester extends		AbstractComponent{
 
 	protected void		runAllUnitTests()
 	{
-		this.testSimple();
+		this.testSwitchOnOff();
+		this.testTemperature();
+		this.testSetMode();
+		this.testCooling();
+		this.statistics.statisticsReport(this);
+	
+	}
+	
+	public void			testSwitchOnOff()
+	{
+		this.logMessage("Feature: switching the Refrigerateur on and off");
+		this.logMessage("  Scenario: switching on when off");
+		boolean resultState ;
+		RefrigerateurMode resultMode = null;
+		try {
+			this.logMessage("    Given the Refrigerateur is off");
+			resultState = this.ruop.on();
+			if (resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    When the Refrigerateur is turned on");
+			this.ruop.switchOn();
+			this.logMessage("    Then the Refrigerateur is on");
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.incorrectResult();
+			}
+			this.logMessage("    And the Refrigerateur is in mode NORMAL");
+			resultMode = this.ruop.getMode();
+			if (!RefrigerateurMode.NORMAL.equals(resultMode)) {
+				this.logMessage("     but was: " + resultMode);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: switching on when on");
+		this.logMessage("    Given the Refrigerateur is on");
+		try {
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur is turned on");
+		this.logMessage("    Then a precondition exception is thrown");
+		boolean old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.ruop.switchOn();
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch(Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: switching off when on");
+		this.logMessage("    Given the Refrigerateur is on");
+		try {
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur is turned off");
+		try {
+			this.ruop.switchOff();
+			this.logMessage("    Then the Refrigerateur is off");
+			resultState = this.ruop.on();
+			if (resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: switching off when off");
+		this.logMessage("    Given the Refrigerateur is off");
+		try {
+			resultState = this.ruop.on();
+			if (resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur is turned off");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.ruop.switchOff();
+			this.logMessage("     but the precondition exception was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+	}
+
+	protected void		testTemperature()
+	{
+		this.logMessage("Feature: getting and setting the target temperature"
+						+ " of the Refrigerateur");
+
+		this.logMessage("  Scenario: getting the target temperature through the"
+						+ " user interface when just initialised");
+		this.logMessage("    Given the Refrigerateur is initialised");
+		this.logMessage("    And the Refrigerateur has not been used yet");
+		this.logMessage("    And the Refrigerateur is on");
+		boolean resultState;
+		TimedMeasure<Double> temperature = null;
+		try {
+			this.ruop.switchOn();
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: off");
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    When I get the target temperature through the "
+							+ "user interface ");
+			temperature = this.ruop.getTargetTemperature();
+			if (temperature.getMeasure().getData() ==
+					Refrigerateur.STANDARD_TARGET_TEMPERATURE.getData()
+				&& temperature.getMeasure().getMeasurementUnit().equals(
+													MeasurementUnit.CELSIUS)) {
+				this.logMessage("    Then the target temperature of the Refrigerateur"
+								+ " is the Refrigerateur standard target temperature");
+			} else {
+				this.logMessage("     but was: " + temperature.getMeasure());
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: getting the target temperature through the internal control interface when just initialised");
+		this.logMessage("    Given the Refrigerateur is initialised");
+		this.logMessage("    And the Refrigerateur has not been used yet");
+		this.logMessage("    And the Refrigerateur is on");
+		try {
+			this.logMessage("    When I get the target temperature through the internal control interface");
+			temperature = this.riop.getTargetTemperature();
+			if (temperature.getMeasure().getData() ==
+					Refrigerateur.STANDARD_TARGET_TEMPERATURE.getData()
+				&& temperature.getMeasure().getMeasurementUnit().equals(
+													MeasurementUnit.CELSIUS)) {
+				this.logMessage("    Then the target temperature of the Refrigerateur"
+								+ " is the Refrigerateur standard target temperature");
+			} else {
+				this.logMessage("     but was: " + temperature.getMeasure());
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: setting the target temperature of the "
+						+ "Refrigerateur when on");
+		this.logMessage("    Given the Refrigerateur is initialised");
+		this.logMessage("    And the Refrigerateur is on");
+		try {
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: off");
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    When I set the temperature at any given "
+							+ "temperature between 2 and 8 Celsius inclusive");
+			this.ruop.setTargetTemperature(
+					new Measure<Double>(3.0, Refrigerateur.TEMPERATURE_UNIT));
+			temperature = this.ruop.getTargetTemperature();
+			if (temperature.getMeasure().getData() == 3.0 &&
+					temperature.getMeasure().getMeasurementUnit().equals(
+													MeasurementUnit.CELSIUS)) {
+				this.logMessage("    Then the target temperature of the Refrigerateur"
+								+ " is the given temperature");
+			} else {
+				this.statistics.incorrectResult();
+				this.logMessage("     but was not: " + temperature.getMeasure());
+			}
+
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+		
+		this.logMessage("  Scenario: getting the current temperature of the "
+				+ "  Refrigerateur when on");
+		this.logMessage("  Given the Refrigerateur is on");
+		try {
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: off");
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    When I get the current temperature through "
+							+ " the user interface");
+			temperature = this.ruop.getCurrentTemperature();
+			this.logMessage("    Then the current temperature is the fake "
+							+ " temperature 5 Celsius");
+			if (temperature.getMeasure().getData() !=
+						Refrigerateur.FAKE_CURRENT_TEMPERATURE.getMeasure().getData()
+				|| !temperature.getMeasure().getMeasurementUnit().equals(
+													MeasurementUnit.CELSIUS)) {
+				this.logMessage("     but was: " + temperature.getMeasure());
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: setting the target temperature of the "
+				+ "  Refrigerateurout of the range");
+		this.logMessage("    And the Refrigerateur is on");
+		try {
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: off");
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When I set the temperature to 10 Celsius"
+						+ "  Then a precondition exception is thrown");
+		boolean old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.ruop.setTargetTemperature(
+					new Measure<Double>(10.0, Refrigerateur.TEMPERATURE_UNIT));
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			// attendu : la precondition MIN <= target <= MAX a echoue
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+		this.logMessage("    And the Refrigerateur is switched off");
+		try {
+			this.ruop.switchOff();
+		} catch (Throwable e) {
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+	}
+
+	public void			testSetMode()
+	{
+		this.logMessage("Feature: switching the Refrigerateur ECO, NORMAL and RAPIDE.");
+		this.logMessage("  Scenario: set the Refrigerateur RAPIDE from NORMAL");
+		this.logMessage("    Given the Refrigerateur is on");
+		boolean resultState;
+		RefrigerateurMode resultMode = null;
+		try {
+			this.ruop.switchOn();
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    And the Refrigerateur is NORMAL");
+			resultMode = this.ruop.getMode();
+			if (!RefrigerateurMode.NORMAL.equals(resultMode)) {
+				this.logMessage("     but was: " + resultMode);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    When the Refrigerateur is set RAPIDE");
+			this.logMessage("    Then the Refrigerateur is on");
+			
+			this.ruop.setMode(RefrigerateurMode.RAPIDE);
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    And  the Refrigerateur is RAPIDE");
+			resultMode = this.ruop.getMode();
+			if (!RefrigerateurMode.RAPIDE.equals(resultMode)) {
+				this.logMessage("     but was: " + resultMode);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: set the Refrigerateur RAPIDE from RAPIDE");
+		this.logMessage("    Given the Refrigerateur is on");
+		this.logMessage("    And the Refrigerateur is RAPIDE");
+		this.logMessage("    When the Refrigerateur is set RAPIDE");
+		this.logMessage("    Then a precondition exception is thrown");
+		boolean old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.ruop.setMode(RefrigerateurMode.RAPIDE);
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+
+		
+		this.logMessage("  Scenario: set the Refrigerateur mode to null");
+		this.logMessage("    Given the Refrigerateur is on");
+		try {
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur mode is set to null");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.ruop.setMode(null);
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			// attendu : la precondition m != null a echoue
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: set the Refrigerateur ECO from RAPIDE while cooling");
+		this.logMessage("    Given the Refrigerateur is on");
+		this.logMessage("    and  the Refrigerateur is cooling");
+		
+		try {
+
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		
+		try {
+			this.riop.startCooling();
+			if (!this.riop.cooling()) {
+				this.logMessage("    but was not cooling ");
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    And the Refrigerateur is RAPIDE");
+			resultMode = this.ruop.getMode();
+			if (!RefrigerateurMode.RAPIDE.equals(resultMode)) {
+				this.logMessage("     but was: " + resultMode);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    When the Refrigerateur is set ECO");
+			this.logMessage("    Then the Refrigerateur is on");
+			
+			this.ruop.setMode(RefrigerateurMode.ECO);
+			resultState = this.ruop.on();
+			if (!resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		try {
+			this.logMessage("    And  the Refrigerateur is ECO");
+			resultMode = this.ruop.getMode();
+			if (!RefrigerateurMode.ECO.equals(resultMode) || !this.riop.cooling()) {
+				this.logMessage("     but was: " + resultMode);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		
+		this.logMessage("  Scenario: set the Refrigerateur NORMAL when off");
+		this.logMessage("    Given the Refrigerateur is off");
+		try {
+			this.ruop.switchOff();
+			resultState = this.ruop.on();
+			if (resultState) {
+				this.logMessage("     but was: " + resultState);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur is set NORMAL");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.ruop.setMode(RefrigerateurMode.NORMAL);
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			// attendu : la precondition getState() == ON a echoue
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+	}
+
+	public void			testCooling()
+	{
+		this.logMessage("Feature: cooling the Refrigerateur on and off");
+		this.logMessage("Scenario: starting cooling when not cooling ");
+		boolean resultState ;
+		boolean isCooling;
+		try {
+			this.logMessage("    Given the Refrigerateur is on and is not cooling");
+			this.ruop.switchOn();
+			resultState = this.ruop.on();
+			isCooling = this.riop.cooling();
+			if (!resultState || isCooling) {
+				this.logMessage("     but was: on=" + resultState + "     /but was: cooling=" + isCooling );
+				this.statistics.failedCondition();
+			}
+			this.logMessage("    When the Refrigerateur is starts cooling");
+			this.riop.startCooling();
+			this.logMessage("    Then the Refrigerateur is cooling");
+			isCooling = this.riop.cooling();
+			if (!isCooling) {
+				this.logMessage("     but was: " + isCooling);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: starting cooling when cooling");
+		this.logMessage("    Given the Refrigerateur is cooling");
+		try {
+			isCooling = this.riop.cooling();
+			if (!isCooling) {
+				this.logMessage("     but was: " + isCooling);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur is starts cooling");
+		this.logMessage("    Then a precondition exception is thrown");
+		boolean old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.riop.startCooling();
+			this.logMessage("     but it was not thrown");
+			this.statistics.incorrectResult();
+		} catch(Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: stopping cooling when cooling");
+		this.logMessage("    Given the Refrigerateur is cooling");
+		try {
+			isCooling = this.riop.cooling();
+			if (!isCooling) {
+				this.logMessage("     but was: " + isCooling);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur is stops cooling");
+		try {
+			this.riop.stopCooling();
+			this.logMessage("    Then the Refrigerateur is not cooling");
+			isCooling = this.riop.cooling();
+			if (isCooling) {
+				this.logMessage("     but was: " + isCooling);
+				this.statistics.incorrectResult();
+			}
+		} catch (Throwable e) {
+			this.statistics.incorrectResult();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+
+		this.statistics.updateStatistics();
+
+		this.logMessage("  Scenario: stopping cooling when not cooling");
+		this.logMessage("    Given the Refrigerateur is not cooling");
+		try {
+			isCooling = this.riop.cooling();
+			if (isCooling) {
+				this.logMessage("     but was: " + isCooling);
+				this.statistics.failedCondition();
+			}
+		} catch (Throwable e) {
+			this.statistics.failedCondition();
+			this.logMessage("     but the exception " + e + " has been raised");
+		}
+		this.logMessage("    When the Refrigerateur is stops cooling");
+		this.logMessage("    Then a precondition exception is thrown");
+		old = BCMException.VERBOSE;
+		try {
+			BCMException.VERBOSE = false;
+			this.riop.stopCooling();
+			this.logMessage("     but the precondition exception was not thrown");
+			this.statistics.incorrectResult();
+		} catch (Throwable e) {
+			
+		} finally {
+			BCMException.VERBOSE = old;
+		}
+
+		this.statistics.updateStatistics();
 	}
 
 
