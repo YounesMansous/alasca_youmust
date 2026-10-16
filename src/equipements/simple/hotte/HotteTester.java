@@ -1,22 +1,35 @@
 package equipements.simple.hotte;
 
 import equipements.simple.hotte.connections.HotteUserConnector;
+
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+
 import equipements.simple.hotte.connections.HotteOutboundPort;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.BCMException;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import equipements.CVMIntegrationTest;
 import fr.sorbonne_u.components.utils.tests.TestsStatistics;
 import fr.sorbonne_u.exceptions.AssertionChecking;
 import fr.sorbonne_u.exceptions.ImplementationInvariantException;
 import fr.sorbonne_u.exceptions.InvariantException;
 import fr.sorbonne_u.exceptions.PreconditionException;
+import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
+import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
+import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
+import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 
 @RequiredInterfaces(required = {HotteUserCI.class, ClocksServerCI.class})
 public class HotteTester extends		AbstractComponent{
 
+	public static final int		SWITCH_ON_DELAY = 2;
+	public static final int		SWITCH_OFF_DELAY = 9;
+
+	
 	public static boolean				VERBOSE = false;
 
 	public static int					X_RELATIVE_POSITION = 0;
@@ -78,7 +91,7 @@ public class HotteTester extends		AbstractComponent{
 			String hotteInboundPortURI
 			) throws Exception
 		{
-			super(1, 0);
+			super(1, 1);
 
 			assert	hotteInboundPortURI != null &&
 											!hotteInboundPortURI.isEmpty() :
@@ -96,7 +109,7 @@ public class HotteTester extends		AbstractComponent{
 			String reflectionInboundPortURI
 			) throws Exception
 		{
-			super(reflectionInboundPortURI, 1, 0);
+			super(reflectionInboundPortURI, 1, 1);
 
 			this.isUnitTest = isUnitTest;
 			this.initialise(hotteInboundPortURI);
@@ -143,13 +156,69 @@ public class HotteTester extends		AbstractComponent{
 		}
 	}
 	
-	@Override
 	public synchronized void execute() throws Exception
 	{
-		this.traceMessage("Hotte Tester starts the tests.\n");
-		this.runAllUnitTests();
-		this.traceMessage("Hotte Tester ends.\n");
+		if (this.isUnitTest) {
+			this.traceMessage("Hotte Tester starts the tests.\n");
+			this.runAllUnitTests();
+			this.traceMessage("Hotte Tester ends.\n");
+		} else {
+			// 1. recuperer l'horloge acceleree
+			ClocksServerOutboundPort clocksServerOutboundPort =
+											new ClocksServerOutboundPort(this);
+			clocksServerOutboundPort.publishPort();
+			this.doPortConnection(
+					clocksServerOutboundPort.getPortURI(),
+					ClocksServer.STANDARD_INBOUNDPORT_URI,
+					ClocksServerConnector.class.getCanonicalName());
+			this.traceMessage("Hotte tester gets the clock.\n");
+			AcceleratedClock ac =
+					clocksServerOutboundPort.getClock(CVMIntegrationTest.CLOCK_URI);
+			this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
+			clocksServerOutboundPort.unpublishPort();
+			clocksServerOutboundPort = null;
+
+			// 2. calculer les instants d'allumage et d'extinction
+			Instant startInstant = ac.getStartInstant();
+			Instant hotteTurnOn = startInstant.plusSeconds(SWITCH_ON_DELAY);
+			Instant hotteTurnOff = startInstant.plusSeconds(SWITCH_OFF_DELAY);
+
+			// 3. attendre le depart de l'horloge
+			this.traceMessage("Hotte tester waits until start.\n");
+			ac.waitUntilStart();
+
+			// 4. programmer l'allumage et l'extinction
+			this.traceMessage("Hotte tester schedules turn on and off.\n");
+			long delayToTurnOn = ac.nanoDelayUntilInstant(hotteTurnOn);
+			long delayToTurnOff = ac.nanoDelayUntilInstant(hotteTurnOff);
+			AbstractComponent o = this;
+			this.scheduleTaskOnComponent(
+					new AbstractComponent.AbstractTask() {
+						@Override
+						public void run() {
+							try {
+								o.traceMessage("Hotte turns on.\n");
+								hop.turnOn();
+							} catch (Throwable e) {
+								e.printStackTrace();
+							}
+						}
+					}, delayToTurnOn, TimeUnit.NANOSECONDS);
+			this.scheduleTaskOnComponent(
+					new AbstractComponent.AbstractTask() {
+						@Override
+						public void run() {
+							try {
+								o.traceMessage("Hotte turns off.\n");
+								hop.turnOff();
+							} catch (Throwable e) {
+								e.printStackTrace();
+							}
+						}
+					}, delayToTurnOff, TimeUnit.NANOSECONDS);
+		}
 	}
+
 
 	
 	@Override

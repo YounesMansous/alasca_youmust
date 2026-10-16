@@ -1,5 +1,9 @@
 package equipements.variable.refrigerateur;
 
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+
+import equipements.CVMIntegrationTest;
 import equipements.variable.refrigerateur.connections.RefrigerateurExternalControlConnector;
 import equipements.variable.refrigerateur.connections.RefrigerateurExternalControlOutboundPort;
 import equipements.variable.refrigerateur.connections.RefrigerateurInternalControlConnector;
@@ -19,12 +23,21 @@ import fr.sorbonne_u.exceptions.AssertionChecking;
 import fr.sorbonne_u.exceptions.ImplementationInvariantException;
 import fr.sorbonne_u.exceptions.InvariantException;
 import fr.sorbonne_u.exceptions.PreconditionException;
+import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
+import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
+import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
+import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 
 @RequiredInterfaces(required = {RefrigerateurUserCI.class,
 		RefrigerateurInternalControlCI.class,
-		RefrigerateurExternalControlCI.class})
+		RefrigerateurExternalControlCI.class, 
+		ClocksServerCI.class})
 public class RefrigerateurTester extends		AbstractComponent{
 	
+	public static final int		SWITCH_ON_DELAY = 2;
+	public static final int		SWITCH_OFF_DELAY = 9;
+
 	public static boolean				VERBOSE = false;
 
 	public static int					X_RELATIVE_POSITION = 0;
@@ -110,7 +123,7 @@ public class RefrigerateurTester extends		AbstractComponent{
 			String refrigerateurExternalControlInboundPortURI
 			) throws Exception
 		{
-			super(1, 0);
+			super(1, 1);
 
 			assert	refrigerateurUserInboundPortURI != null &&
 											!refrigerateurUserInboundPortURI.isEmpty() :
@@ -145,7 +158,7 @@ public class RefrigerateurTester extends		AbstractComponent{
 			String reflectionInboundPortURI
 			) throws Exception
 		{
-			super(reflectionInboundPortURI, 1, 0);
+			super(reflectionInboundPortURI, 1, 1);
 
 			this.isUnitTest = isUnitTest;
 			this.initialise(refrigerateurUserInboundPortURI,
@@ -213,13 +226,70 @@ public class RefrigerateurTester extends		AbstractComponent{
 		}
 	}
 	
-	@Override
+	
 	public synchronized void execute() throws Exception
 	{
-		this.traceMessage("Refrigerateur Tester starts the tests.\n");
-		this.runAllUnitTests();
-		this.traceMessage("Refrigerateur Tester ends.\n");
+		if (this.isUnitTest) {
+			this.traceMessage("Refrigerateur Tester starts the tests.\n");
+			this.runAllUnitTests();
+			this.traceMessage("Refrigerateur Tester ends.\n");
+		} else {
+			// 1. recuperer l'horloge acceleree
+			ClocksServerOutboundPort clocksServerOutboundPort =
+											new ClocksServerOutboundPort(this);
+			clocksServerOutboundPort.publishPort();
+			this.doPortConnection(
+					clocksServerOutboundPort.getPortURI(),
+					ClocksServer.STANDARD_INBOUNDPORT_URI,
+					ClocksServerConnector.class.getCanonicalName());
+			this.traceMessage("Refrigerateur tester gets the clock.\n");
+			AcceleratedClock ac =
+					clocksServerOutboundPort.getClock(CVMIntegrationTest.CLOCK_URI);
+			this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
+			clocksServerOutboundPort.unpublishPort();
+			clocksServerOutboundPort = null;
+
+			// 2. calculer les instants d'allumage et d'extinction
+			Instant startInstant = ac.getStartInstant();
+			Instant refrigerateurSwitchOn = startInstant.plusSeconds(SWITCH_ON_DELAY);
+			Instant refrigerateurSwitchOff = startInstant.plusSeconds(SWITCH_OFF_DELAY);
+
+			// 3. attendre le depart de l'horloge
+			this.traceMessage("Refrigerateur tester waits until start.\n");
+			ac.waitUntilStart();
+
+			// 4. programmer l'allumage et l'extinction
+			this.traceMessage("Refrigerateur tester schedules switch on and off.\n");
+			long delayToSwitchOn = ac.nanoDelayUntilInstant(refrigerateurSwitchOn);
+			long delayToSwitchOff = ac.nanoDelayUntilInstant(refrigerateurSwitchOff);
+			AbstractComponent o = this;
+			this.scheduleTaskOnComponent(
+					new AbstractComponent.AbstractTask() {
+						@Override
+						public void run() {
+							try {
+								o.traceMessage("Refrigerateur switch on.\n");
+								ruop.switchOn();
+							} catch (Throwable e) {
+								e.printStackTrace();
+							}
+						}
+					}, delayToSwitchOn, TimeUnit.NANOSECONDS);
+			this.scheduleTaskOnComponent(
+					new AbstractComponent.AbstractTask() {
+						@Override
+						public void run() {
+							try {
+								o.traceMessage("Refrigerateur switches off.\n");
+								ruop.switchOff();
+							} catch (Throwable e) {
+								e.printStackTrace();
+							}
+						}
+					}, delayToSwitchOff, TimeUnit.NANOSECONDS);
+		}
 	}
+
 
 	@Override
 	public synchronized void	finalise() throws Exception
@@ -331,7 +401,7 @@ public class RefrigerateurTester extends		AbstractComponent{
 				this.logMessage("     but was: " + resultState);
 				this.statistics.failedCondition();
 			}
-			this.logMessage("    When the Refrigerateur is turned on");
+			this.logMessage("    When the Refrigerateur is switched on");
 			this.ruop.switchOn();
 			this.logMessage("    Then the Refrigerateur is on");
 			resultState = this.ruop.on();
@@ -364,7 +434,7 @@ public class RefrigerateurTester extends		AbstractComponent{
 			this.statistics.failedCondition();
 			this.logMessage("     but the exception " + e + " has been raised");
 		}
-		this.logMessage("    When the Refrigerateur is turned on");
+		this.logMessage("    When the Refrigerateur is switched on");
 		this.logMessage("    Then a precondition exception is thrown");
 		boolean old = BCMException.VERBOSE;
 		try {
@@ -392,7 +462,7 @@ public class RefrigerateurTester extends		AbstractComponent{
 			this.statistics.failedCondition();
 			this.logMessage("     but the exception " + e + " has been raised");
 		}
-		this.logMessage("    When the Refrigerateur is turned off");
+		this.logMessage("    When the Refrigerateur is switched off");
 		try {
 			this.ruop.switchOff();
 			this.logMessage("    Then the Refrigerateur is off");
@@ -420,7 +490,7 @@ public class RefrigerateurTester extends		AbstractComponent{
 			this.statistics.failedCondition();
 			this.logMessage("     but the exception " + e + " has been raised");
 		}
-		this.logMessage("    When the Refrigerateur is turned off");
+		this.logMessage("    When the Refrigerateur is switched off");
 		this.logMessage("    Then a precondition exception is thrown");
 		old = BCMException.VERBOSE;
 		try {
