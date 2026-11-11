@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Descripteur du connecteur de la machine à café automatique.
+  Il explique au HEM comment traduire AdjustableCI (interface générique du HEM)
+  en appels à MachineCafeAutomatiqueExternalControlJava4CI (interface de la
+  machine). Schéma : control-adapter.rnc.
+
+  Les 3 modes correspondent à 3 paliers de puissance de la résistance :
+  mode k  =>  k/3 de la puissance maximale (environ 467 W, 933 W, 1400 W).
+-->
+<control-adapter
+    xmlns="http://www.sorbonne-universite.fr/alasca/control-adapter"
+    uid="MCA-0001"
+    offered="equipments.modulable.MachineCafeAutomatiqueExternalControlJava4CI">
+
+  <consumption nominal="1400" min="0" max="1400"/>
+
+  <required>fr.sorbonne_u.exceptions.PreconditionException</required>
+
+  <!-- Variables du connecteur : nombre de modes, mode courant, suspension -->
+  <instance-var modifiers="protected static" type="int" name="MAX_MODE"
+                static-init="3"/>
+  <instance-var modifiers="protected" type="int" name="currentMode"
+                static-init="MAX_MODE"/>
+  <instance-var modifiers="protected" type="boolean" name="isSuspended"
+                static-init="false"/>
+
+  <!-- Puissance (en watts) correspondant à un mode -->
+  <internal modifiers="protected" type="double" name="computePowerLevel">
+    <parameter type="int" name="mode"/>
+    <thrown>java.lang.Exception</thrown>
+    <body equipmentRef="machine">
+      if (mode &lt;= 0 || mode &gt; MAX_MODE) {
+        throw new fr.sorbonne_u.exceptions.PreconditionException("mode &gt; 0 &amp;&amp; mode &lt;= MAX_MODE");
+      }
+      double maxPowerLevel = machine.getMaxPowerLevelJava4();
+      return mode * maxPowerLevel / MAX_MODE;
+    </body>
+  </internal>
+
+  <!-- Règle la puissance de la résistance (jamais au-dessus du maximum) -->
+  <internal modifiers="protected" type="void" name="setPowerLevel">
+    <parameter type="double" name="newPowerLevel"/>
+    <thrown>java.lang.Exception</thrown>
+    <body equipmentRef="machine">
+      if (newPowerLevel &lt; 0.0) {
+        throw new fr.sorbonne_u.exceptions.PreconditionException("newPowerLevel &gt;= 0.0");
+      }
+      double maxPowerLevel = machine.getMaxPowerLevelJava4();
+      if (newPowerLevel &gt; maxPowerLevel) {
+        newPowerLevel = maxPowerLevel;
+      }
+      machine.setCurrentPowerLevelJava4(newPowerLevel);
+    </body>
+  </internal>
+
+  <!-- Applique à la machine la puissance d'un mode -->
+  <internal modifiers="protected" type="void"
+            name="computeAndSetNewPowerLevel">
+    <parameter type="int" name="newMode"/>
+    <thrown>java.lang.Exception</thrown>
+    <body equipmentRef="machine">
+      setPowerLevel(computePowerLevel(newMode));
+    </body>
+  </internal>
+
+  <maxMode>
+    <body>
+      return MAX_MODE;
+    </body>
+  </maxMode>
+
+  <upMode>
+    <body>
+      if (isSuspended) {
+        return false;
+      }
+      try {
+        computeAndSetNewPowerLevel(currentMode + 1);
+        currentMode++;
+      } catch (Exception e) {
+        return false;
+      }
+      return true;
+    </body>
+  </upMode>
+
+  <downMode>
+    <body>
+      if (isSuspended) {
+        return false;
+      }
+      try {
+        computeAndSetNewPowerLevel(currentMode - 1);
+        currentMode--;
+      } catch (Exception e) {
+        return false;
+      }
+      return true;
+    </body>
+  </downMode>
+
+  <setMode>
+    <parameter name="modeIndex"/>
+    <body>
+      if (isSuspended) {
+        return false;
+      }
+      try {
+        computeAndSetNewPowerLevel(modeIndex);
+        currentMode = modeIndex;
+      } catch (Exception e) {
+        return false;
+      }
+      return true;
+    </body>
+  </setMode>
+
+  <currentMode>
+    <body>
+      return currentMode;
+    </body>
+  </currentMode>
+
+  <getModeConsumption>
+    <parameter name="modeIndex"/>
+    <body>
+      return computePowerLevel(modeIndex);
+    </body>
+  </getModeConsumption>
+
+  <suspended>
+    <body>
+      return isSuspended;
+    </body>
+  </suspended>
+
+  <!-- Suspendre = couper la résistance (puissance à 0) -->
+  <suspend>
+    <body equipmentRef="machine">
+      try {
+        machine.setCurrentPowerLevelJava4(0.0);
+        isSuspended = true;
+      } catch (Exception e) {
+        return false;
+      }
+      return true;
+    </body>
+  </suspend>
+
+  <!-- Reprendre = remettre la puissance du mode courant -->
+  <resume>
+    <body equipmentRef="machine">
+      try {
+        computeAndSetNewPowerLevel(currentMode);
+        isSuspended = false;
+      } catch (Exception e) {
+        return false;
+      }
+      return true;
+    </body>
+  </resume>
+
+  <!-- Aucune information sur la température côté externe : jamais urgent -->
+  <emergency>
+    <body>
+      return 0.0;
+    </body>
+  </emergency>
+
+</control-adapter>
