@@ -24,6 +24,11 @@ MachineCafeAutomatiqueConfigurationI{
 	
 	public TimedMeasure<Double>	getCurrentPowerLevel() throws Exception;
 
-	public void	setCurrentPowerLevel(Measure<Double> powerLevel)
-	throws Exception;
+	public void	setCurrentPowerLevel(Measure<Double> powerLevel) throws Exception;
+
+	public boolean isSuspendable() throws Exception;
+	
+	public TimedMeasure<Double> getCurrentTemperature() throws Exception;
+	
+	public Measure<Double> getTargetTemperature() throws Exception;
 }

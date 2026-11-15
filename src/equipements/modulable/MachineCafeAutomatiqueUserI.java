@@ -11,11 +11,15 @@ MachineCafeAutomatiqueStateI{
 		
 	}
 	
-	public void orderCoffee(MachineCafeAutomatiqueOption choice);
+	public void chooseCoffeeType(MachineCafeAutomatiqueOption choice);
 	
-	public void insertCapsule();
+	public void chooseCoffeeQuality(MachineCafeAutomatiqueOption choice);
 	
-	public void refillTank();
+	public void refillWater();
+	
+	public void refillMilk();
+	
+	public void refillBeans();
 	
 	public void switchOff();
 	

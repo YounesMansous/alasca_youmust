@@ -15,13 +15,17 @@ extends	OfferedCI,
 
 	}
 	
-	public void orderCoffee(MachineCafeAutomatiqueOption choice) throws Exception;
+	public void chooseCoffeeType(MachineCafeAutomatiqueOption choice) throws Exception;
 	
-	public void insertCapsule() throws Exception;
+	public void chooseCoffeeQuality(MachineCafeAutomatiqueOption choice) throws Exception;
 	
-	public void refillTank() throws Exception;
+	public void refillWater() throws Exception;
 	
-	public void switchOff() throws Exception;
+	public void refillMilk() throws Exception;
+	
+	public void refillBeans() throws Exception;
+	
+	void switchOff() throws Exception;
 	
 	
 }

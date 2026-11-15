@@ -37,35 +37,6 @@ implements	MachineCafeAutomatiqueUserCI
 						"owner instanceof MachineCafeAutomatiqueUserI");
 	}
 
-	// Chaque méthode appelle la même méthode sur le composant
-	@Override
-	public void orderCoffee(MachineCafeAutomatiqueOption choice)
-	throws Exception
-	{
-		this.getOwner().handleRequest(
-				o -> {	((MachineCafeAutomatiqueUserI)o).orderCoffee(choice);
-						return null;
-				});
-	}
-
-	@Override
-	public void insertCapsule() throws Exception
-	{
-		this.getOwner().handleRequest(
-				o -> {	((MachineCafeAutomatiqueUserI)o).insertCapsule();
-						return null;
-				});
-	}
-
-	@Override
-	public void refillTank() throws Exception
-	{
-		this.getOwner().handleRequest(
-				o -> {	((MachineCafeAutomatiqueUserI)o).refillTank();
-						return null;
-				});
-	}
-
 	@Override
 	public void switchOff() throws Exception
 	{
@@ -73,5 +44,50 @@ implements	MachineCafeAutomatiqueUserCI
 				o -> {	((MachineCafeAutomatiqueUserI)o).switchOff();
 						return null;
 				});
+	}
+
+	@Override
+	public void chooseCoffeeType(MachineCafeAutomatiqueOption choice) throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((MachineCafeAutomatiqueUserI)o).chooseCoffeeType(choice);
+						return null;
+				});
+		
+	}
+
+	@Override
+	public void chooseCoffeeQuality(MachineCafeAutomatiqueOption choice) throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((MachineCafeAutomatiqueUserI)o).chooseCoffeeQuality(choice);
+						return null;
+				});
+		
+	}
+
+	@Override
+	public void refillWater() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((MachineCafeAutomatiqueUserI)o).refillWater();
+						return null;
+				});
+		
+	}
+
+	@Override
+	public void refillMilk() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((MachineCafeAutomatiqueUserI)o).refillMilk();
+						return null;
+				});
+		
+	}
+
+	@Override
+	public void refillBeans() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((MachineCafeAutomatiqueUserI)o).refillBeans();
+						return null;
+				});
+		
 	}
 }

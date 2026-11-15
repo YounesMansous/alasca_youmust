@@ -1,9 +1,15 @@
 package equipements.modulable.connections;
 
+import java.util.ArrayList;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.RejectedExecutionException;
+
 import equipements.modulable.MachineCafeAutomatiqueInternalControlCI;
 import equipements.modulable.MachineCafeAutomatiqueInternalControlI;
 import equipements.modulable.MachineCafeAutomatiqueOption;
 import equipements.modulable.MachineCafeAutomatiqueState;
+import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
@@ -50,13 +56,6 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	}
 
 	@Override
-	public boolean isCapsulIn() throws Exception
-	{
-		return this.getOwner().handleRequest(
-				o -> ((MachineCafeAutomatiqueInternalControlI)o).isCapsulIn());
-	}
-
-	@Override
 	public MachineCafeAutomatiqueState getState() throws Exception
 	{
 		return this.getOwner().handleRequest(
@@ -64,26 +63,19 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	}
 
 	@Override
-	public MachineCafeAutomatiqueOption getSelectedOption() throws Exception
+	public ArrayList<MachineCafeAutomatiqueOption> getSelectedOptions() throws Exception
 	{
 		return this.getOwner().handleRequest(
 				o -> ((MachineCafeAutomatiqueInternalControlI)o).
-														getSelectedOption());
+				getSelectedOptions());
 	}
 
 	@Override
-	public TimedMeasure<Double> getTargetTemperature() throws Exception
+	public Measure<Double> getTargetTemperature() throws Exception
 	{
 		return this.getOwner().handleRequest(
 				o -> ((MachineCafeAutomatiqueInternalControlI)o).
 														getTargetTemperature());
-	}
-
-	@Override
-	public TimedMeasure<Double> getTankLevel() throws Exception
-	{
-		return this.getOwner().handleRequest(
-				o -> ((MachineCafeAutomatiqueInternalControlI)o).getTankLevel());
 	}
 
 	@Override
@@ -123,15 +115,6 @@ implements	MachineCafeAutomatiqueInternalControlCI
 				o -> ((MachineCafeAutomatiqueInternalControlI)o).isBrewing());
 	}
 
-	// Passage à la phase suivante
-	@Override
-	public boolean startReadyState() throws Exception
-	{
-		return this.getOwner().handleRequest(
-				o -> ((MachineCafeAutomatiqueInternalControlI)o).
-														startReadyState());
-	}
-
 	@Override
 	public boolean startHeating() throws Exception
 	{
@@ -144,5 +127,120 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	{
 		return this.getOwner().handleRequest(
 				o -> ((MachineCafeAutomatiqueInternalControlI)o).startBrewing());
+	}
+
+	@Override
+	public TimedMeasure<Double> getWaterTankLevel() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).getWaterTankLevel());
+	}
+
+	@Override
+	public TimedMeasure<Double> getMilkTankLevel() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).getMilkTankLevel());
+	}
+
+	@Override
+	public TimedMeasure<Double> getBeansTanklevel() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).getBeansTanklevel());
+	}
+
+	@Override
+	public boolean endHeating() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).endHeating());
+	}
+
+	@Override
+	public boolean startWarming() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).startWarming());
+	}
+
+	@Override
+	public boolean isWarmingUp() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).isWarmingUp());
+	}
+
+	@Override
+	public boolean startRinsing() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).startRinsing());
+	}
+
+	@Override
+	public boolean isRinsing() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).isRinsing());
+	}
+
+	@Override
+	public boolean startGrinding() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).startGrinding());
+	}
+
+	@Override
+	public boolean isInfusing() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).isInfusing());
+	}
+
+	@Override
+	public boolean startInfusing() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).startInfusing());
+	}
+
+	@Override
+	public boolean startSteaming() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).startSteaming());
+	}
+
+	@Override
+	public boolean isSteaming() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).isSteaming());
+	}
+
+	@Override
+	public boolean startReady() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).startReady());
+	}
+
+	@Override
+	public boolean startEcoStandBy() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).startEcoStandBy());
+	}
+
+	@Override
+	public boolean isEcoStandBy() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).isEcoStandBy());
+	}
+
+	@Override
+	public boolean isGrinding() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).isGrinding());
 	}
 }

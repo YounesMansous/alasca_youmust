@@ -1,5 +1,8 @@
 package equipements.modulable;
 
+import java.util.ArrayList;
+
+import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
 import fr.sorbonne_u.exceptions.AssertionChecking;
 import fr.sorbonne_u.exceptions.PreconditionException;
@@ -23,17 +26,19 @@ public interface MachineCafeAutomatiqueStateI extends MachineCafeAutomatiqueConf
 		return ret;
 	}
 	
-	public boolean on();
-	
-	public boolean isCapsulIn();
-	
 	public MachineCafeAutomatiqueState getState();
 	
-	public MachineCafeAutomatiqueOption getSelectedOption();
+	public ArrayList<MachineCafeAutomatiqueOption> getSelectedOptions();
 	
-	public TimedMeasure<Double> getTargetTemperature();
-	
-	public TimedMeasure<Double> getTankLevel();
+	public Measure<Double> getTargetTemperature();
 	
 	public TimedMeasure<Double> getCurrentTemperature();
+	
+	public TimedMeasure<Double> getWaterTankLevel();
+	
+	public TimedMeasure<Double> getMilkTankLevel();
+	
+	public TimedMeasure<Double> getBeansTanklevel();
+	
+	public boolean on();
 }

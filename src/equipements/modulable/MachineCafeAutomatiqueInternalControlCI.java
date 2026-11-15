@@ -1,5 +1,8 @@
 package equipements.modulable;
 
+import java.util.ArrayList;
+
+import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
 import fr.sorbonne_u.components.interfaces.OfferedCI;
 import fr.sorbonne_u.components.interfaces.RequiredCI;
@@ -19,30 +22,58 @@ MachineCafeAutomatiqueConfigurationI{
 	
 	public boolean on() throws Exception;
 	
-	public boolean isCapsulIn() throws Exception;
-	
 	public MachineCafeAutomatiqueState getState() throws Exception;
 	
-	public MachineCafeAutomatiqueOption getSelectedOption() throws Exception;
+	public ArrayList<MachineCafeAutomatiqueOption> getSelectedOptions() throws Exception;
 	
-	public TimedMeasure<Double> getTargetTemperature() throws Exception;
+	public Measure<Double> getTargetTemperature() throws Exception;
 	
-	public TimedMeasure<Double> getTankLevel() throws Exception;
+	public TimedMeasure<Double> getWaterTankLevel() throws Exception;
+	
+	public TimedMeasure<Double> getMilkTankLevel() throws Exception;
+	
+	public TimedMeasure<Double> getBeansTanklevel() throws Exception;
 	
 	public TimedMeasure<Double> getCurrentTemperature() throws Exception;
 	
+	public boolean isHeating() throws Exception;
+	
+	public boolean startHeating() throws Exception;
+	
+	public boolean endHeating() throws Exception;
+	
 	public boolean isAwaiting() throws Exception;
 	
-	public boolean startReadyState() throws Exception;;
+	public boolean startWarming() throws Exception;
 	
-	public boolean isReady() throws Exception;;
+	public boolean isWarmingUp() throws Exception;
 	
-	public boolean isHeating() throws Exception;;
+	public boolean startRinsing() throws Exception;
 	
-	public boolean startHeating() throws Exception;;
+	public boolean isRinsing() throws Exception;
 	
-	public boolean isBrewing() throws Exception;;
+	public boolean startGrinding() throws Exception;
 	
-	public boolean startBrewing() throws Exception;;
+	public boolean isGrinding() throws Exception;
+	
+	public boolean startInfusing() throws Exception;
+	
+	public boolean isInfusing() throws Exception;
+	
+	public boolean startBrewing() throws Exception;
+	
+	public boolean isBrewing() throws Exception;
+	
+	public boolean startSteaming() throws Exception;
+	
+	public boolean isSteaming() throws Exception;
+	
+	public boolean startReady() throws Exception;
+	
+	public boolean isReady() throws Exception;
+	
+	public boolean startEcoStandBy() throws Exception;
+	
+	public boolean isEcoStandBy() throws Exception;
 
 }

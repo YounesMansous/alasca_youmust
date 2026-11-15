@@ -12,29 +12,40 @@ public class MachineCafeAutomatiqueUserConnector
 extends		AbstractConnector
 implements	MachineCafeAutomatiqueUserCI
 {
-	// "offering" est le port entrant de la machine
-	@Override
-	public void orderCoffee(MachineCafeAutomatiqueOption choice)
-	throws Exception
-	{
-		((MachineCafeAutomatiqueUserCI)this.offering).orderCoffee(choice);
-	}
-
-	@Override
-	public void insertCapsule() throws Exception
-	{
-		((MachineCafeAutomatiqueUserCI)this.offering).insertCapsule();
-	}
-
-	@Override
-	public void refillTank() throws Exception
-	{
-		((MachineCafeAutomatiqueUserCI)this.offering).refillTank();
-	}
 
 	@Override
 	public void switchOff() throws Exception
 	{
 		((MachineCafeAutomatiqueUserCI)this.offering).switchOff();
+	}
+
+	@Override
+	public void chooseCoffeeType(MachineCafeAutomatiqueOption choice) throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.offering).chooseCoffeeType(choice);
+		
+	}
+
+	@Override
+	public void chooseCoffeeQuality(MachineCafeAutomatiqueOption choice) throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.offering).chooseCoffeeQuality(choice);
+		
+	}
+
+	@Override
+	public void refillWater() throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.offering).refillWater();
+		
+	}
+
+	@Override
+	public void refillMilk() throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.offering).refillMilk();
+		
+	}
+
+	@Override
+	public void refillBeans() throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.offering).refillBeans();
+		
 	}
 }

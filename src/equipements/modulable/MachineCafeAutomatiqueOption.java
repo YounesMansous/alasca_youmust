@@ -1,7 +1,14 @@
 package equipements.modulable;
 
 public enum MachineCafeAutomatiqueOption {
-
 	ESPRESSO,
-	LONG_COFFEE
-}
+	LUNGO,
+	CAPPUCCINO,
+	LATTE,
+	HOT_WATER,
+	PETITE,
+	GRANDE,
+	DOUCE,
+	NORMALE,
+	FORTE
+	}

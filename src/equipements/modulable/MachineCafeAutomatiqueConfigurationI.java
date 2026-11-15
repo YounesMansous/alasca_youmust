@@ -14,9 +14,15 @@ public interface MachineCafeAutomatiqueConfigurationI {
 	
 	public static final MeasurementUnit LEQUID_UNIT = MeasurementUnit.LITRES;
 	
-	public static final Measure<Double>	TANK_CAPACITY = new Measure<Double>(1.0, LEQUID_UNIT);
+	public static final MeasurementUnit WEIGHT_UNIT = MeasurementUnit.RAW; 
 	
-	public static final Measure<Double>	MAX_POWER_LEVEL = new Measure<Double>(1400.0, POWER_UNIT);
+	public static final Measure<Double>	WATER_TANK_CAPACITY = new Measure<Double>(1.8, LEQUID_UNIT);
+	
+	public static final Measure<Double>	MILK_TANK_CAPACITY = new Measure<Double>(0.5, LEQUID_UNIT);
+	
+	public static final Measure<Double>	BEANS_TANK_CAPACITY = new Measure<Double>(2.5, WEIGHT_UNIT);
+	
+	public static final Measure<Double>	MAX_POWER_LEVEL = new Measure<Double>(1500.0, POWER_UNIT);
 	
 	public static final Measure<Double>	TENSION = new Measure<Double>(220.0, TENSION_UNIT);
 	
@@ -55,9 +61,17 @@ public interface MachineCafeAutomatiqueConfigurationI {
 		ret &= AssertionChecking.checkStaticInvariant(TEMPERATURE_UNIT != null, MachineCafeAutomatiqueConfigurationI.class, "TEMPERATURE_UNIT != null");
 		ret &= AssertionChecking.checkStaticInvariant(LEQUID_UNIT != null, MachineCafeAutomatiqueConfigurationI.class, "LEQUID_UNIT != null");
 		ret &= AssertionChecking.checkStaticInvariant(
-				TANK_CAPACITY != null && TANK_CAPACITY.getMeasurementUnit().equals(LEQUID_UNIT) && TANK_CAPACITY.getData() == 1.0,
+				WATER_TANK_CAPACITY != null && WATER_TANK_CAPACITY.getMeasurementUnit().equals(LEQUID_UNIT) && WATER_TANK_CAPACITY.getData() == 1.8,
 				MachineCafeAutomatiqueConfigurationI.class,
-				"TANK_CAPACITY != null && TANK_CAPACITY.getMeasurementUnit().equals(LEQUID_UNIT) && TANK_CAPACITY.getData() == 1.0");
+				"WATER_TANK_CAPACITY != null && WATER_TANK_CAPACITY.getMeasurementUnit().equals(LEQUID_UNIT) && WATER_TANK_CAPACITY.getData() == 1.8");
+		ret &= AssertionChecking.checkStaticInvariant(
+				MILK_TANK_CAPACITY != null && MILK_TANK_CAPACITY.getMeasurementUnit().equals(LEQUID_UNIT) && MILK_TANK_CAPACITY.getData() == 0.5,
+				MachineCafeAutomatiqueConfigurationI.class,
+				"MILK_TANK_CAPACITY != null && MILK_TANK_CAPACITY.getMeasurementUnit().equals(LEQUID_UNIT) && MILK_TANK_CAPACITY.getData() == 0.5");
+		ret &= AssertionChecking.checkStaticInvariant(
+				BEANS_TANK_CAPACITY != null && BEANS_TANK_CAPACITY.getMeasurementUnit().equals(WEIGHT_UNIT) && BEANS_TANK_CAPACITY.getData() == 2.5,
+				MachineCafeAutomatiqueConfigurationI.class,
+				"BEANS_TANK_CAPACITY != null && BEANS_TANK_CAPACITY.getMeasurementUnit().equals(WEIGHT_UNIT) && BEANS_TANK_CAPACITY.getData() == 2.5");
 		ret &= AssertionChecking.checkStaticInvariant(
 				MAX_POWER_LEVEL != null && MAX_POWER_LEVEL.getMeasurementUnit().equals(POWER_UNIT) &&
 				MAX_POWER_LEVEL.getData() > 0.0,

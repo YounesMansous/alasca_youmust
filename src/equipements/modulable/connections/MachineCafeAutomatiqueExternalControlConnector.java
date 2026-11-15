@@ -41,4 +41,21 @@ implements	MachineCafeAutomatiqueExternalControlCI
 		((MachineCafeAutomatiqueExternalControlCI)this.offering).
 												setCurrentPowerLevel(powerLevel);
 	}
+
+	@Override
+	public boolean isSuspendable() throws Exception {
+		return ((MachineCafeAutomatiqueExternalControlCI)this.offering).isSuspendable();
+	}
+
+	@Override
+	public TimedMeasure<Double> getCurrentTemperature() throws Exception {
+		// TODO Auto-generated method stub
+		return ((MachineCafeAutomatiqueExternalControlCI)this.offering).getCurrentTemperature();
+	}
+
+	@Override
+	public Measure<Double> getTargetTemperature() throws Exception {
+		// TODO Auto-generated method stub
+		return ((MachineCafeAutomatiqueExternalControlCI)this.offering).getTargetTemperature();
+	}
 }

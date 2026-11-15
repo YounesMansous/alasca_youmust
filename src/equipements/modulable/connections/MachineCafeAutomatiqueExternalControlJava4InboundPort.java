@@ -52,4 +52,16 @@ implements	MachineCafeAutomatiqueExternalControlJava4CI
 							powerLevel,
 							MachineCafeAutomatiqueConfigurationI.POWER_UNIT));
 	}
+
+	@Override
+	public double getCurrentTemperatureJava4() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getCurrentTemperature().getMeasure().getData();
+	}
+
+	@Override
+	public double getTargetTemperatureJava4() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getTargetTemperature().getData();
+	}
 }

@@ -30,13 +30,13 @@ MachineCafeAutomatiqueStateI {
 		return ret;
 	}
 	
-	public boolean on();
-	
 	public Measure<Double>	getMaxPowerLevel();
 	
 	public TimedMeasure<Double>	getCurrentPowerLevel();
 
 	public void	setCurrentPowerLevel(Measure<Double> powerLevel);
+	
+	public boolean isSuspendable();
 	
 
 }

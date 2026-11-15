@@ -1,8 +1,11 @@
 package equipements.modulable.connections;
 
+import java.util.ArrayList;
+
 import equipements.modulable.MachineCafeAutomatiqueInternalControlCI;
 import equipements.modulable.MachineCafeAutomatiqueOption;
 import equipements.modulable.MachineCafeAutomatiqueState;
+import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
@@ -42,13 +45,6 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	}
 
 	@Override
-	public boolean isCapsulIn() throws Exception
-	{
-		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-																isCapsulIn();
-	}
-
-	@Override
 	public MachineCafeAutomatiqueState getState() throws Exception
 	{
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
@@ -56,24 +52,17 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	}
 
 	@Override
-	public MachineCafeAutomatiqueOption getSelectedOption() throws Exception
+	public ArrayList<MachineCafeAutomatiqueOption> getSelectedOptions() throws Exception
 	{
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-															getSelectedOption();
+															getSelectedOptions();
 	}
 
 	@Override
-	public TimedMeasure<Double> getTargetTemperature() throws Exception
+	public Measure<Double> getTargetTemperature() throws Exception
 	{
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
 														getTargetTemperature();
-	}
-
-	@Override
-	public TimedMeasure<Double> getTankLevel() throws Exception
-	{
-		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-															getTankLevel();
 	}
 
 	@Override
@@ -83,54 +72,149 @@ implements	MachineCafeAutomatiqueInternalControlCI
 														getCurrentTemperature();
 	}
 
-	// Test de la phase courante
 	@Override
-	public boolean isAwaiting() throws Exception
-	{
+	public TimedMeasure<Double> getWaterTankLevel() throws Exception {
+		// TODO Auto-generated method stub
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-																isAwaiting();
+				getWaterTankLevel();
 	}
 
 	@Override
-	public boolean isReady() throws Exception
-	{
+	public TimedMeasure<Double> getMilkTankLevel() throws Exception {
+		// TODO Auto-generated method stub
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-																	isReady();
+				getMilkTankLevel();
 	}
 
 	@Override
-	public boolean isHeating() throws Exception
-	{
+	public TimedMeasure<Double> getBeansTanklevel() throws Exception {
+		// TODO Auto-generated method stub
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-																isHeating();
+				getBeansTanklevel();
 	}
 
 	@Override
-	public boolean isBrewing() throws Exception
-	{
+	public boolean isHeating() throws Exception {
+		// TODO Auto-generated method stub
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-																isBrewing();
-	}
-
-	// Passage à la phase suivante
-	@Override
-	public boolean startReadyState() throws Exception
-	{
-		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-															startReadyState();
+				isHeating();
 	}
 
 	@Override
-	public boolean startHeating() throws Exception
-	{
+	public boolean startHeating() throws Exception {
+		// TODO Auto-generated method stub
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-															startHeating();
+				startHeating();
 	}
 
 	@Override
-	public boolean startBrewing() throws Exception
-	{
+	public boolean endHeating() throws Exception {
+		// TODO Auto-generated method stub
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-															startBrewing();
+				endHeating();
 	}
+
+	@Override
+	public boolean isAwaiting() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isAwaiting();
+	}
+
+	@Override
+	public boolean startWarming() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				startWarming();
+	}
+
+	@Override
+	public boolean isWarmingUp() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isWarmingUp();
+	}
+
+	@Override
+	public boolean startRinsing() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				startRinsing();
+	}
+
+	@Override
+	public boolean isRinsing() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isRinsing();
+	}
+
+	@Override
+	public boolean startGrinding() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				startGrinding();
+	}
+
+	@Override
+	public boolean isInfusing() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isInfusing();
+	}
+
+	@Override
+	public boolean startInfusing() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				startInfusing();
+	}
+
+	@Override
+	public boolean isBrewing() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isBrewing();
+	}
+
+	@Override
+	public boolean startBrewing() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				startBrewing();
+	}
+
+	@Override
+	public boolean startSteaming() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				startSteaming();
+	}
+
+	@Override
+	public boolean isSteaming() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isSteaming();
+	}
+
+	@Override
+	public boolean startReady() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				startReady();
+	}
+
+	@Override
+	public boolean isReady() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isReady();
+	}
+
+	@Override
+	public boolean startEcoStandBy() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				startEcoStandBy();
+	}
+
+	@Override
+	public boolean isEcoStandBy() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isEcoStandBy();
+	}
+
+	@Override
+	public boolean isGrinding() throws Exception {
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+				isGrinding();
+	}
+
+
 }

@@ -29,29 +29,39 @@ implements	MachineCafeAutomatiqueUserCI
 		super(uri, MachineCafeAutomatiqueUserCI.class, owner);
 	}
 
-	// Chaque méthode passe par le connecteur
-	@Override
-	public void orderCoffee(MachineCafeAutomatiqueOption choice)
-	throws Exception
-	{
-		((MachineCafeAutomatiqueUserCI)this.getConnector()).orderCoffee(choice);
-	}
-
-	@Override
-	public void insertCapsule() throws Exception
-	{
-		((MachineCafeAutomatiqueUserCI)this.getConnector()).insertCapsule();
-	}
-
-	@Override
-	public void refillTank() throws Exception
-	{
-		((MachineCafeAutomatiqueUserCI)this.getConnector()).refillTank();
-	}
-
 	@Override
 	public void switchOff() throws Exception
 	{
 		((MachineCafeAutomatiqueUserCI)this.getConnector()).switchOff();
+	}
+
+	@Override
+	public void chooseCoffeeType(MachineCafeAutomatiqueOption choice) throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.getConnector()).chooseCoffeeType(choice);
+		
+	}
+
+	@Override
+	public void chooseCoffeeQuality(MachineCafeAutomatiqueOption choice) throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.getConnector()).chooseCoffeeQuality(choice);
+		
+	}
+
+	@Override
+	public void refillWater() throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.getConnector()).refillWater();
+		
+	}
+
+	@Override
+	public void refillMilk() throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.getConnector()).refillMilk();
+		
+	}
+
+	@Override
+	public void refillBeans() throws Exception {
+		((MachineCafeAutomatiqueUserCI)this.getConnector()).refillBeans();
+		
 	}
 }

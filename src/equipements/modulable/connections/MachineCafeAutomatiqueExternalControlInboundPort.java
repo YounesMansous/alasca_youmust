@@ -92,4 +92,28 @@ implements	MachineCafeAutomatiqueExternalControlCI
 						return null;
 				});
 	}
+
+	@Override
+	public boolean isSuspendable() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueExternalControlI)o).
+														isSuspendable());
+	}
+
+	@Override
+	public TimedMeasure<Double> getCurrentTemperature() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueExternalControlI)o).
+				getCurrentTemperature());
+	}
+
+	@Override
+	public Measure<Double> getTargetTemperature() throws Exception {
+		// TODO Auto-generated method stub
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueExternalControlI)o).
+				getTargetTemperature());
+	}
 }
