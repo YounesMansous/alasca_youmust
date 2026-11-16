@@ -9,13 +9,6 @@ public interface MachineCafeAutomatiqueExternalControlCI extends
 OfferedCI,
 RequiredCI,
 MachineCafeAutomatiqueConfigurationI{
-
-	public static boolean	staticInvariants() throws Exception
-	{
-		boolean ret = true;
-		ret &= MachineCafeAutomatiqueConfigurationI.staticInvariants();
-		return ret;
-	}
 	
 	
 	public boolean on() throws Exception;

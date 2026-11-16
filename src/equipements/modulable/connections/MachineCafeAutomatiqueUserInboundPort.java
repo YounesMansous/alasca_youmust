@@ -1,6 +1,8 @@
 package equipements.modulable.connections;
 
-import equipements.modulable.MachineCafeAutomatiqueOption;
+import equipements.modulable.MachineCafeAutomatiqueDrink;
+import equipements.modulable.MachineCafeAutomatiqueIntensity;
+import equipements.modulable.MachineCafeAutomatiqueSize;
 import equipements.modulable.MachineCafeAutomatiqueUserCI;
 import equipements.modulable.MachineCafeAutomatiqueUserI;
 import fr.sorbonne_u.components.ComponentI;
@@ -47,21 +49,30 @@ implements	MachineCafeAutomatiqueUserCI
 	}
 
 	@Override
-	public void chooseCoffeeType(MachineCafeAutomatiqueOption choice) throws Exception {
+	public void chooseCoffeeType(MachineCafeAutomatiqueDrink choice) throws Exception {
 		this.getOwner().handleRequest(
 				o -> {	((MachineCafeAutomatiqueUserI)o).chooseCoffeeType(choice);
 						return null;
 				});
-		
+
 	}
 
 	@Override
-	public void chooseCoffeeQuality(MachineCafeAutomatiqueOption choice) throws Exception {
+	public void chooseCoffeeIntensity(MachineCafeAutomatiqueIntensity choice) throws Exception {
 		this.getOwner().handleRequest(
-				o -> {	((MachineCafeAutomatiqueUserI)o).chooseCoffeeQuality(choice);
+				o -> {	((MachineCafeAutomatiqueUserI)o).chooseCoffeeIntensity(choice);
 						return null;
 				});
-		
+
+	}
+
+	@Override
+	public void chooseCoffeeSize(MachineCafeAutomatiqueSize choice) throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((MachineCafeAutomatiqueUserI)o).chooseCoffeeSize(choice);
+						return null;
+				});
+
 	}
 
 	@Override

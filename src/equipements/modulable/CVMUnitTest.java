@@ -19,9 +19,9 @@ extends		AbstractCVM
 	public CVMUnitTest() throws Exception
 	{
 		super();
-		MachineCafeAutomatiqueTester.VERBOSE = true;
-		MachineCafeAutomatiqueTester.X_RELATIVE_POSITION = 0;
-		MachineCafeAutomatiqueTester.Y_RELATIVE_POSITION = 0;
+		MachineCafeAutomatiqueUnitTester.VERBOSE = true;
+		MachineCafeAutomatiqueUnitTester.X_RELATIVE_POSITION = 0;
+		MachineCafeAutomatiqueUnitTester.Y_RELATIVE_POSITION = 0;
 		MachineCafeAutomatique.VERBOSE = true;
 		MachineCafeAutomatique.X_RELATIVE_POSITION = 1;
 		MachineCafeAutomatique.Y_RELATIVE_POSITION = 0;
@@ -35,7 +35,7 @@ extends		AbstractCVM
 				MachineCafeAutomatique.class.getCanonicalName(),
 				new Object[]{});
 		AbstractComponent.createComponent(
-				MachineCafeAutomatiqueTester.class.getCanonicalName(),
+				MachineCafeAutomatiqueUnitTester.class.getCanonicalName(),
 				new Object[]{});
 
 		super.deploy();

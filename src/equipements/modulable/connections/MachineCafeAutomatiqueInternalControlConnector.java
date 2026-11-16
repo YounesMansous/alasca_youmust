@@ -1,9 +1,9 @@
 package equipements.modulable.connections;
 
-import java.util.ArrayList;
-
+import equipements.modulable.MachineCafeAutomatiqueDrink;
+import equipements.modulable.MachineCafeAutomatiqueIntensity;
 import equipements.modulable.MachineCafeAutomatiqueInternalControlCI;
-import equipements.modulable.MachineCafeAutomatiqueOption;
+import equipements.modulable.MachineCafeAutomatiqueSize;
 import equipements.modulable.MachineCafeAutomatiqueState;
 import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
@@ -34,10 +34,24 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	}
 
 	@Override
-	public ArrayList<MachineCafeAutomatiqueOption> getSelectedOptions() throws Exception
+	public MachineCafeAutomatiqueDrink getSelectedDrink() throws Exception
 	{
 		return ((MachineCafeAutomatiqueInternalControlCI)this.offering).
-															getSelectedOptions();
+															getSelectedDrink();
+	}
+
+	@Override
+	public MachineCafeAutomatiqueIntensity getSelectedIntensity() throws Exception
+	{
+		return ((MachineCafeAutomatiqueInternalControlCI)this.offering).
+														getSelectedIntensity();
+	}
+
+	@Override
+	public MachineCafeAutomatiqueSize getSelectedSize() throws Exception
+	{
+		return ((MachineCafeAutomatiqueInternalControlCI)this.offering).
+															getSelectedSize();
 	}
 
 	@Override
@@ -65,14 +79,14 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	public TimedMeasure<Double> getMilkTankLevel() throws Exception {
 		// TODO Auto-generated method stub
 		return ((MachineCafeAutomatiqueInternalControlCI)this.offering).
-				getWaterTankLevel();
+				getMilkTankLevel();
 	}
 
 	@Override
 	public TimedMeasure<Double> getBeansTanklevel() throws Exception {
 		// TODO Auto-generated method stub
 		return ((MachineCafeAutomatiqueInternalControlCI)this.offering).
-				getWaterTankLevel();
+				getBeansTanklevel();
 	}
 
 	@Override

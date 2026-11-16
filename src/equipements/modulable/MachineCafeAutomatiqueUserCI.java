@@ -15,9 +15,11 @@ extends	OfferedCI,
 
 	}
 	
-	public void chooseCoffeeType(MachineCafeAutomatiqueOption choice) throws Exception;
-	
-	public void chooseCoffeeQuality(MachineCafeAutomatiqueOption choice) throws Exception;
+	public void chooseCoffeeType(MachineCafeAutomatiqueDrink choice) throws Exception;
+
+	public void chooseCoffeeIntensity(MachineCafeAutomatiqueIntensity choice) throws Exception;
+
+	public void chooseCoffeeSize(MachineCafeAutomatiqueSize choice) throws Exception;
 	
 	public void refillWater() throws Exception;
 	

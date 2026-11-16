@@ -1,7 +1,5 @@
 package equipements.modulable;
 
-import java.util.ArrayList;
-
 import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
 import fr.sorbonne_u.components.interfaces.OfferedCI;
@@ -24,7 +22,11 @@ MachineCafeAutomatiqueConfigurationI{
 	
 	public MachineCafeAutomatiqueState getState() throws Exception;
 	
-	public ArrayList<MachineCafeAutomatiqueOption> getSelectedOptions() throws Exception;
+	public MachineCafeAutomatiqueDrink getSelectedDrink() throws Exception;
+
+	public MachineCafeAutomatiqueIntensity getSelectedIntensity() throws Exception;
+
+	public MachineCafeAutomatiqueSize getSelectedSize() throws Exception;
 	
 	public Measure<Double> getTargetTemperature() throws Exception;
 	

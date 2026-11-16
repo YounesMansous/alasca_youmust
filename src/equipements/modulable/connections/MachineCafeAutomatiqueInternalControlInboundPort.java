@@ -1,13 +1,14 @@
 package equipements.modulable.connections;
 
-import java.util.ArrayList;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
 
 import equipements.modulable.MachineCafeAutomatiqueInternalControlCI;
 import equipements.modulable.MachineCafeAutomatiqueInternalControlI;
-import equipements.modulable.MachineCafeAutomatiqueOption;
+import equipements.modulable.MachineCafeAutomatiqueDrink;
+import equipements.modulable.MachineCafeAutomatiqueIntensity;
+import equipements.modulable.MachineCafeAutomatiqueSize;
 import equipements.modulable.MachineCafeAutomatiqueState;
 import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
@@ -63,11 +64,27 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	}
 
 	@Override
-	public ArrayList<MachineCafeAutomatiqueOption> getSelectedOptions() throws Exception
+	public MachineCafeAutomatiqueDrink getSelectedDrink() throws Exception
 	{
 		return this.getOwner().handleRequest(
 				o -> ((MachineCafeAutomatiqueInternalControlI)o).
-				getSelectedOptions());
+														getSelectedDrink());
+	}
+
+	@Override
+	public MachineCafeAutomatiqueIntensity getSelectedIntensity() throws Exception
+	{
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).
+														getSelectedIntensity());
+	}
+
+	@Override
+	public MachineCafeAutomatiqueSize getSelectedSize() throws Exception
+	{
+		return this.getOwner().handleRequest(
+				o -> ((MachineCafeAutomatiqueInternalControlI)o).
+														getSelectedSize());
 	}
 
 	@Override

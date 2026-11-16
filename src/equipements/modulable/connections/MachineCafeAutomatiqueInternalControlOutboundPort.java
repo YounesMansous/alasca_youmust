@@ -1,9 +1,9 @@
 package equipements.modulable.connections;
 
-import java.util.ArrayList;
-
+import equipements.modulable.MachineCafeAutomatiqueDrink;
+import equipements.modulable.MachineCafeAutomatiqueIntensity;
 import equipements.modulable.MachineCafeAutomatiqueInternalControlCI;
-import equipements.modulable.MachineCafeAutomatiqueOption;
+import equipements.modulable.MachineCafeAutomatiqueSize;
 import equipements.modulable.MachineCafeAutomatiqueState;
 import fr.sorbonne_u.alasca.physical_data.Measure;
 import fr.sorbonne_u.alasca.physical_data.TimedMeasure;
@@ -52,10 +52,24 @@ implements	MachineCafeAutomatiqueInternalControlCI
 	}
 
 	@Override
-	public ArrayList<MachineCafeAutomatiqueOption> getSelectedOptions() throws Exception
+	public MachineCafeAutomatiqueDrink getSelectedDrink() throws Exception
 	{
 		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
-															getSelectedOptions();
+															getSelectedDrink();
+	}
+
+	@Override
+	public MachineCafeAutomatiqueIntensity getSelectedIntensity() throws Exception
+	{
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+														getSelectedIntensity();
+	}
+
+	@Override
+	public MachineCafeAutomatiqueSize getSelectedSize() throws Exception
+	{
+		return ((MachineCafeAutomatiqueInternalControlCI)this.getConnector()).
+															getSelectedSize();
 	}
 
 	@Override

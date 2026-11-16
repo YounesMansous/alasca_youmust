@@ -4,16 +4,18 @@ public interface MachineCafeAutomatiqueUserI extends
 MachineCafeAutomatiqueStateI{
 	
 	
-	public static boolean staticInvariant() {
+	public static boolean invariants() {
 		boolean ret = true;
 		ret &= MachineCafeAutomatiqueConfigurationI.staticInvariants();
 		return ret;
 		
 	}
 	
-	public void chooseCoffeeType(MachineCafeAutomatiqueOption choice);
-	
-	public void chooseCoffeeQuality(MachineCafeAutomatiqueOption choice);
+	public void chooseCoffeeType(MachineCafeAutomatiqueDrink choice);
+
+	public void chooseCoffeeIntensity(MachineCafeAutomatiqueIntensity choice);
+
+	public void chooseCoffeeSize(MachineCafeAutomatiqueSize choice);
 	
 	public void refillWater();
 	
